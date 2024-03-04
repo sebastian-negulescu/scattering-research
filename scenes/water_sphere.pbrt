@@ -1,0 +1,36 @@
+LookAt 0 0 3 # eye
+       0 0 0  # look at point
+       0 1 0  # up vector
+Camera "perspective" "float fov" 45
+
+Sampler "halton" "integer pixelsamples" 128
+Integrator "volpath"
+Film "rgb" "string filename" "water_sphere.png"
+     "integer xresolution" [400] "integer yresolution" [400]
+
+WorldBegin
+
+# approximate the sun
+# LightSource "distant"  "point3 from" [ -30 40  100 ]
+#    "blackbody L" 3000 "float scale" 1.5
+
+# add spotlight behind sphere
+LightSource "spot"
+    # "blackbody I" [5500]
+    "float power" 2 
+    
+    "spectrum I" [ 644 0 652 1 660 0 ]
+    "point3 from" [ 0 0 -3 ]
+    "point3 to" [ 0 0 0 ]
+    "float coneangle" 30
+    "float conedeltaangle" 5 
+
+MakeNamedMedium "salt_water" 
+    "string type" 
+    "homogeneous" 
+MediumInterface "salt_water" ""
+
+AttributeBegin
+    Material "interface"
+    Shape "sphere" "float radius" 1
+AttributeEnd
