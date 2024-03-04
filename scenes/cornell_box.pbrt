@@ -1,8 +1,8 @@
-LookAt  0 0 -11 # eye, one unit further back than the edges of the box
+LookAt  0 0 -40 # eye
         0 0 0 # look at point
         0 1 0 # up vector
     #   x y z
-Camera "perspective" "float fov" 90 
+Camera "perspective" "float fov" 45 
 
 Sampler "halton" "integer pixelsamples" 128
 Integrator "volpath"
@@ -12,71 +12,82 @@ Film "rgb"
 
 WorldBegin
 
-LightSource "point"
-    "float power" 1000
-    "rgb I" [ .7 .7 .7 ]
-    "point3 from" [ 0 0 0 ]
-
 # create box
 # left wall needs to be red, right wall green
 AttributeBegin
-    Attribute "shape" "integer indices" [ 0 1 3    0 2 3 ]
+
+    Attribute "shape" "integer indices" [ 0 3 1    0 2 3 ]
     Attribute "shape" "point3 P" [ -10 -10 0    -10 10 0    10 -10 0    10 10 0 ]
 
-# white diffuse material
+    # white diffuse material
     MakeNamedMaterial "white wall"
         "string type" "diffuse"
         "rgb reflectance" [ .7 .7 .7 ]
 
-# red diffuse material
+    # red diffuse material
     MakeNamedMaterial "red wall"
         "string type" "diffuse"
         "rgb reflectance" [ .7 .2 .2 ]
 
-# green diffuse material
+    # green diffuse material
     MakeNamedMaterial "green wall"
         "string type" "diffuse"
         "rgb reflectance" [ .2 .7 .2 ]
 
-NamedMaterial "white wall"
+    NamedMaterial "white wall"
 
-# back
+    # back
     AttributeBegin
         Translate 0 0 10
         Shape "trianglemesh"
     AttributeEnd
 
-# bottom
+    # bottom
     AttributeBegin
-        Translate 0 -10 10
         Rotate 90 1 0 0 # 90 degrees around x axis
+        Translate 0 0 10
         Shape "trianglemesh"
     AttributeEnd
 
-# top
+    # top
     AttributeBegin
-        Translate 0 10 10
         Rotate 90 1 0 0
+        Translate 0 0 -10
         Shape "trianglemesh"
+            "integer indices" [ 0 4 1    0 6 4    1 4 5    1 5 3    0 2 6    2 7 6    2 3 7    3 5 7 ]
+            "point3 P" [ -10 -10 0    -10 10 0    10 -10 0    10 10 0    -2 -2 0    -2 2 0    2 -2 0    2 2 0 ]
     AttributeEnd
 
-NamedMaterial "green wall"
-
-# right
+    # light
     AttributeBegin
-        Translate 10 0 10
+        AreaLightSource "diffuse" 
+            "blackbody L" [ 6500 ]
+            "float power" [ 1000 ]
+        Rotate 90 1 0 0
+        Translate 0 0 -10
+        Shape "trianglemesh"
+            "integer indices" [ 0 3 1    0 2 3 ]
+            "point3 P" [ -2 -2 0    -2 2 0    2 -2 0    2 2 0 ]
+    AttributeEnd
+
+    NamedMaterial "green wall"
+
+    # right
+    AttributeBegin
         Rotate 90 0 1 0 # 90 degrees around y axis
+        Translate 0 0 10
         Shape "trianglemesh"
     AttributeEnd
 
-NamedMaterial "red wall"
+    NamedMaterial "red wall"
 
-# left 
+    # left 
     AttributeBegin
-        Translate -10 0 10
         Rotate 90 0 1 0
+        Translate 0 0 -10
         Shape "trianglemesh"
     AttributeEnd
+
 AttributeEnd
 
 # Translate 2 0 0
