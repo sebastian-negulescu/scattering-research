@@ -1,0 +1,55 @@
+LookAt  0 0 -40 # eye
+        0 0 0 # look at point
+        0 1 0 # up vector
+    #   x y z
+Camera "perspective" "float fov" 45 
+
+Sampler "halton" "integer pixelsamples" 128
+Integrator "volpath"
+Film "rgb" 
+    "string filename" "medium_filled_sphere.png"
+    "integer xresolution" [400] "integer yresolution" [400]
+
+WorldBegin
+
+Include "cornell_box.pbrt"
+
+# make dielectric sphere with another sphere inside full of medium
+AttributeBegin
+    MakeNamedMedium "blue mist"
+        "string type" "homogeneous"
+        "rgb sigma_s" [ .1 .1 .1 ]
+        "rgb sigma_a" [ .8 .8 .1 ]
+    MediumInterface "" "blue mist"
+
+    Material "dielectric"
+        # "float roughness" .1
+    Translate -6 0 0
+    Shape "sphere" "float radius" [ 2.5 ]
+AttributeEnd
+
+AttributeBegin
+    MakeNamedMedium "green mist"
+        "string type" "homogeneous"
+        "rgb sigma_s" [ .1 .1 .1 ]
+        "rgb sigma_a" [ .8 .1 .8 ]
+    MediumInterface "" "green mist"
+
+    Material "dielectric"
+        # "float roughness" .1
+    Shape "sphere" "float radius" [ 2.5 ]
+AttributeEnd
+
+AttributeBegin
+    MakeNamedMedium "red mist"
+        "string type" "homogeneous"
+        "rgb sigma_s" [ .1 .1 .1 ]
+        "rgb sigma_a" [ .1 .8 .8 ]
+    MediumInterface "" "red mist"
+
+    Material "dielectric"
+        # "float roughness" .1
+    Translate 6 0 0
+    Shape "sphere" "float radius" [ 2.5 ]
+AttributeEnd
+
