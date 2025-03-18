@@ -131,22 +131,33 @@ void ParticleIntegrator::Render() {
 
     LOG_VERBOSE("center ray: %s, %s", center_ray, center_ray_world);
 
-    Vector3f h = camera.GetCameraTransform().RenderFromCamera(Ray(
+    Vector3f o = camera.GetCameraTransform().RenderFromCamera(Ray(
                 Point3f(0, 0, 0), 
-                Normalize(Vector3f(perspective_camera->cameraFromRaster(Point3f(1, 0, 0)))))).d;
-    Vector3f v = camera.GetCameraTransform().RenderFromCamera(Ray(
+                Normalize(Vector3f(perspective_camera->cameraFromRaster(Point3f(0, 0, 0))))
+                )).d;
+    Vector3f a = camera.GetCameraTransform().RenderFromCamera(Ray(
                 Point3f(0, 0, 0), 
-                Normalize(Vector3f(perspective_camera->cameraFromRaster(Point3f(0, 1, 0)))))).d;
+                Normalize(Vector3f(perspective_camera->cameraFromRaster(Point3f(1, 0, 0))))
+                )).d;
+    Vector3f b = camera.GetCameraTransform().RenderFromCamera(Ray(
+                Point3f(0, 0, 0), 
+                Normalize(Vector3f(perspective_camera->cameraFromRaster(Point3f(0, 1, 0))))
+                )).d;
 
-    LOG_VERBOSE("%s, %s", h ,v);
+    LOG_VERBOSE("pre o: %s, a: %s, b: %s", o, a, b);
 
-    float s_h = Dot(center_ray.d, h);
-    float s_v = Dot(center_ray.d, v);
+    float s_o = Dot(center_ray.d, o);
+    float s_a = Dot(center_ray.d, a);
+    float s_b = Dot(center_ray.d, b);
     
-    h = world_frame(-(h / s_h - center_ray.d));
-    v = world_frame(-(v / s_v - center_ray.d));
+    o = world_frame(-(o / s_o - center_ray.d));
+    a = world_frame(-(a / s_a - center_ray.d));
+    b = world_frame(-(b / s_b - center_ray.d));
 
-    LOG_VERBOSE("%s, %s", h ,v);
+    Vector3f h = a - o;
+    Vector3f v = b - o;
+
+    LOG_VERBOSE("post h: %s, v: %s, angle: %s", h ,v, AngleBetween(Normalize(h), Normalize(v)));
 
     Allocator patch_allocator;
     std::vector<TriangleMesh *> patch_meshes;
@@ -181,7 +192,7 @@ void ParticleIntegrator::Render() {
         patches.push_back(std::make_pair(pixel, std::move(Triangle::CreateTriangles(patch_meshes[patch_meshes.size() - 1], patch_allocator))));
     }
 
-    size_t num_rays = 100;
+    size_t num_rays = 10000;
     size_t scatters_captured = 0;
     constexpr float no_jitter = 0.5f;
     for (size_t i = 0; i < num_rays; ++i) {
@@ -194,8 +205,8 @@ void ParticleIntegrator::Render() {
             ErrorExit("No sample value");
         }
 
-        Vector3f scattered_dir = Vector3f(1.f, 0.f, 0.f); 
-        // Vector3f scattered_dir = particle_sample->wi;
+        // Vector3f scattered_dir = Vector3f(1.f, 0.f, 0.f); 
+        Vector3f scattered_dir = particle_sample->wi;
         Ray scattered_ray{particle_origin, scattered_dir};
         LOG_VERBOSE("scattered ray %s", scattered_ray);
 

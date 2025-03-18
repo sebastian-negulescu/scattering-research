@@ -16,7 +16,7 @@ MakeNamedMedium "particle"
     "string type" "homogeneous" 
     "rgb sigma_s" [100 100 100]
     "string phase_function" "Henyey-Greenstein"
-    "float g" 1.
+    "float g" -0.5
 
 # medium needs to be on the outside to get attached to light
 MediumInterface "" "particle"
